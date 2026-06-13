@@ -1,26 +1,200 @@
 @import "tailwindcss";
 
+/* =========================================================================
+   Tema Blue Lagoon — token mentah (PRD Desain Visual Bagian 2.2 & 8).
+   Nama variabel sengaja mengikuti PRD agar mudah dipakai juga di CSS/SVG
+   custom (mis. chart membership & gauge pada tahap berikutnya).
+   ========================================================================= */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  color-scheme: dark;
+
+  /* Base */
+  --bg-base: #051923; /* Ink Black — background halaman */
+  --surface: #003554; /* Deep Space Blue — card, panel */
+  --surface-raised: #024a6b; /* card di atas card / hover surface */
+
+  /* Accent */
+  --accent: #00a6fb; /* Fresh Sky — tombol utama, highlight */
+  --accent-2: #0582ca; /* Steel Blue — hover, aksen sekunder */
+  --accent-3: #006494; /* Baltic Blue — border, ikon, pendukung */
+
+  /* Teks */
+  --text-primary: #eaf6ff; /* hampir putih kebiruan — teks utama */
+  --text-secondary: #9cc4dc; /* biru pucat — teks sekunder/caption */
+  --text-muted: #74a0b8; /* teks redup / placeholder — dinaikkan agar lolos WCAG AA (≥4.5) di atas surface & base (AX-01) */
+
+  /* Garis & state */
+  --border: #0a3247; /* border halus */
+  --border-active: #00a6fb; /* border aktif/fokus */
+
+  /* Warna semantik hasil risiko (PRD 2.3) */
+  --risk-rendah: #00a6fb; /* Cyan cerah */
+  --risk-sedang: #f6c453; /* Amber hangat */
+  --risk-tinggi: #ff5d6c; /* Coral lembut */
+
+  /* Gradien signature (PRD 2.4) */
+  --gradient-hero: linear-gradient(
+    135deg,
+    #00a6fb 0%,
+    #006494 50%,
+    #003554 100%
+  );
+  --gradient-ambient: radial-gradient(
+    120% 80% at 50% 0%,
+    #003554 0%,
+    #051923 60%
+  );
+
+  /* Lebar konten maksimum (PRD Bagian 5) */
+  --content-max: 1080px;
 }
 
+/* =========================================================================
+   Pemetaan token → Tailwind theme (Tailwind v4 CSS-first).
+   Menghasilkan utilities seperti bg-base, bg-surface, text-primary,
+   border-default, rounded-md, font-display, dll.
+   ========================================================================= */
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  /* Warna.
+     NB: token latar dinamai "ink" (bukan "base") agar TIDAK bertabrakan dengan
+     utility bawaan Tailwind `text-base` (font-size). Token "base" akan membuat
+     `text-base`/`sm:text-base` berubah jadi WARNA gelap → teks tak terbaca. */
+  --color-ink: var(--bg-base);
+  --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
+
+  --color-accent: var(--accent);
+  --color-accent-2: var(--accent-2);
+  --color-accent-3: var(--accent-3);
+
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
+
+  --color-border-default: var(--border);
+  --color-border-active: var(--border-active);
+
+  --color-risk-rendah: var(--risk-rendah);
+  --color-risk-sedang: var(--risk-sedang);
+  --color-risk-tinggi: var(--risk-tinggi);
+
+  /* Font (variabel di-inject oleh next/font di layout.tsx) */
+  --font-display: var(--font-space-grotesk);
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-jetbrains-mono);
+
+  /* Radius (PRD Bagian 5: kecil 8 · sedang 12 · besar 16) */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+
+  /* Lebar kontainer konten */
+  --container-content: var(--content-max);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* Spacing scale PRD (4/8/12/16/24/32/48/64) sudah tercakup oleh skala default
+   Tailwind v4 (basis 0.25rem = 4px): mis. p-1=4, p-2=8, p-3=12, p-4=16,
+   p-6=24, p-8=32, p-12=48, p-16=64. Tidak perlu override. */
+
+html {
+  scroll-behavior: smooth; /* dimatikan oleh blok prefers-reduced-motion di bawah */
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  /* Latar rata (flat) — mengurangi ambient gradient agar tidak "generik". */
+  background: var(--bg-base);
+  color: var(--text-primary);
+  font-family: var(--font-sans), system-ui, sans-serif;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Eyebrow / label kecil uppercase — dipakai sebagai penanda seksi & metrik. */
+.eyebrow {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+/* Angka data: monospace, rapat, tabular. */
+.stat-num {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  line-height: 1;
+}
+
+/* Heading memakai font display secara default */
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+/* Animasi load hero: fade + slide-up (PRD Bagian 6, ±400ms) */
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.animate-fade-up {
+  animation: fade-up 0.4s ease-out both;
+}
+
+/* Indikator scroll halus (panah memantul) di bawah hero */
+@keyframes bounce-soft {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(6px);
+  }
+}
+
+.animate-bounce-soft {
+  animation: bounce-soft 1.8s ease-in-out infinite;
+}
+
+/* Bar progres indeterminate untuk overlay proses (PRD 4.4 & 6, <1 detik) */
+@keyframes progress {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(300%);
+  }
+}
+
+.animate-progress {
+  animation: progress 0.9s ease-in-out infinite;
+}
+
+/* Fokus keyboard terlihat jelas (PRD AX-02) */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Hormati prefers-reduced-motion (PRD Bagian 6) */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
