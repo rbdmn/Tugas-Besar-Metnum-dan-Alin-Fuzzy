@@ -53,6 +53,37 @@ export function PanelHeader({
   );
 }
 
+/**
+ * Kotak rumus (gaya panduan): bingkai tipis dengan aksen di tepi kiri,
+ * rumus di tengah (mono), caption kecil opsional di bawah.
+ */
+export function Formula({
+  children,
+  caption,
+  size = "md",
+}: {
+  children: ReactNode;
+  caption?: ReactNode;
+  size?: "sm" | "md";
+}) {
+  return (
+    <div className="border border-border-default border-l-2 border-l-accent bg-surface px-4 py-3">
+      <p
+        className={`text-center font-mono text-text-primary ${
+          size === "md" ? "text-base" : "text-sm"
+        }`}
+      >
+        {children}
+      </p>
+      {caption != null && (
+        <p className="mt-1.5 text-center text-[11px] text-text-muted">
+          {caption}
+        </p>
+      )}
+    </div>
+  );
+}
+
 /** Sel metrik: label uppercase kecil + angka besar mono + caption opsional. */
 export function StatCell({
   label,

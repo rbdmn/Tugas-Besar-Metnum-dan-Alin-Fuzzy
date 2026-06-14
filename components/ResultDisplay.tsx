@@ -1,63 +1,29 @@
 "use client";
 
 import type { MamdaniResult } from "@/lib/fuzzy/mamdani";
-import type { FuzzyLabel, MembershipDegrees, RiskCategory } from "@/lib/fuzzy/types";
-import type { QuestionnaireInputs } from "@/components/Questionnaire";
+import type { RiskCategory } from "@/lib/fuzzy/types";
 import RiskGauge from "@/components/charts/RiskGauge";
-import MembershipChart from "@/components/charts/MembershipChart";
-import { Eyebrow, PanelHeader } from "@/components/ui/primitives";
+import FuzzyProcess from "@/components/FuzzyProcess";
 
 interface ResultDisplayProps {
   result: MamdaniResult;
-  inputs: QuestionnaireInputs;
   onReset: () => void;
 }
 
-const CATEGORY_META: Record<RiskCategory, { emoji: string; range: string; color: string }> = {
+const CATEGORY_META: Record<
+  RiskCategory,
+  { emoji: string; range: string; color: string }
+> = {
   Rendah: { emoji: "😌", range: "0–40", color: "var(--risk-rendah)" },
   Sedang: { emoji: "😟", range: "40–65", color: "var(--risk-sedang)" },
   Tinggi: { emoji: "😰", range: "65–100", color: "var(--risk-tinggi)" },
 };
 
-const LABELS: FuzzyLabel[] = ["Rendah", "Sedang", "Tinggi"];
-
-/** Tabel mini derajat keanggotaan (fuzzifikasi) — data eksplisit. */
-function DegreeTable({
-  title,
-  degrees,
-}: {
-  title: string;
-  degrees: MembershipDegrees;
-}) {
-  return (
-    <div>
-      <Eyebrow className="mb-2">{title}</Eyebrow>
-      <div className="border border-border-default">
-        {LABELS.map((l, i) => (
-          <div
-            key={l}
-            className={`flex items-center justify-between px-3 py-1.5 ${
-              i > 0 ? "border-t border-border-default" : ""
-            }`}
-          >
-            <span className="text-xs text-text-secondary">{l}</span>
-            <span
-              className={`stat-num text-sm ${
-                degrees[l] > 0 ? "text-text-primary" : "text-text-muted"
-              }`}
-            >
-              {degrees[l].toFixed(2)}
-            </span>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-export default function ResultDisplay({ result, inputs, onReset }: ResultDisplayProps) {
+export default function ResultDisplay({ result, onReset }: ResultDisplayProps) {
   const meta = CATEGORY_META[result.category];
   const score = Math.round(result.score);
+  const stresInput = result.trace.fuzzification.stres.input;
+  const tidurInput = result.trace.fuzzification.tidur.input;
 
   return (
     <section
@@ -110,39 +76,14 @@ export default function ResultDisplay({ result, inputs, onReset }: ResultDisplay
         </div>
       </div>
 
-      {/* Grafik membership full-width */}
-      <div className="border-t border-border-default">
-        <PanelHeader
-          label={<>Fungsi Keanggotaan Output (Risiko)</>}
-          meta="μ vs skor"
-        />
-        <div className="px-5 py-5">
-          <div className="mx-auto max-w-xl">
-            <MembershipChart
-              value={result.score}
-              aggregated={result.trace.aggregated}
-            />
-            <p className="mt-3 font-mono text-[11px] text-text-muted">
-              Garis putus-putus = posisi skor hasil · α = derajat aktivasi
-              agregat tiap himpunan output.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* Rincian fuzzifikasi (data eksplisit) */}
-      <div className="border-t border-border-default">
-        <PanelHeader label={<>Rincian Fuzzifikasi</>} meta="derajat keanggotaan input" />
-        <div className="grid grid-cols-1 gap-5 px-5 py-5 sm:grid-cols-2">
-          <DegreeTable title={`Stres = ${inputs.stressScore}`} degrees={result.trace.fuzzifyStres} />
-          <DegreeTable title={`Jam Tidur = ${inputs.sleepHours}`} degrees={result.trace.fuzzifyTidur} />
-        </div>
-      </div>
+      {/* Proses 4 tahap */}
+      <FuzzyProcess result={result} />
 
       {/* Footer */}
       <div className="flex flex-col gap-3 border-t border-border-default bg-surface px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
         <span className="font-mono text-xs text-text-muted">
-          Defuzzifikasi centroid → z* = {result.score.toFixed(2)} → {result.category}
+          Input — Stres {stresInput} · Tidur {tidurInput} jam → z*{" "}
+          {result.score.toFixed(2)} → {result.category}
         </span>
         <button
           type="button"

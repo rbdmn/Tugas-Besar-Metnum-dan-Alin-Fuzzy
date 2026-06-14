@@ -10,7 +10,6 @@ import {
   stressQuestions,
 } from "@/lib/questions";
 import { runMamdani, type MamdaniResult } from "@/lib/fuzzy/mamdani";
-import { Eyebrow } from "@/components/ui/primitives";
 
 export interface QuestionnaireInputs {
   stressScore: number; // 0–100 (jumlah 10 nilai terkonversi)
@@ -195,20 +194,13 @@ export default function Questionnaire({ onResult }: QuestionnaireProps) {
         </div>
       </div>
 
-      {/* Footer: skor live + tombol berdampingan */}
+      {/* Footer: status kelengkapan + tombol */}
       <div className="flex flex-col gap-4 bg-surface px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-baseline gap-3">
-          <Eyebrow>Skor Stres</Eyebrow>
-          <span className="stat-num text-2xl text-text-primary">
-            {stressScore}
-          </span>
-          <span className="font-mono text-xs text-text-muted">/ 100</span>
-          {!canSubmit && (
-            <span className="font-mono text-[11px] text-text-muted">
-              · lengkapi semua input
-            </span>
-          )}
-        </div>
+        <p className="font-mono text-xs text-text-muted">
+          {canSubmit
+            ? "Semua input terisi — siap dihitung."
+            : "Lengkapi semua soal & jam tidur untuk menghitung risiko."}
+        </p>
 
         <button
           type="button"

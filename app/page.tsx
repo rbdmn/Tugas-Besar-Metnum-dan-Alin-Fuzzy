@@ -1,5 +1,6 @@
 import Topbar from "@/components/Topbar";
 import Landing from "@/components/Landing";
+import FuzzyPreview from "@/components/FuzzyPreview";
 import RiskAssessment from "@/components/RiskAssessment";
 
 export default function Home() {
@@ -8,6 +9,7 @@ export default function Home() {
       <Topbar />
       <main className="flex-1 space-y-10 px-4 py-10 sm:px-6">
         <Landing />
+        <FuzzyPreview />
         <RiskAssessment />
       </main>
       <footer className="border-t border-border-default">

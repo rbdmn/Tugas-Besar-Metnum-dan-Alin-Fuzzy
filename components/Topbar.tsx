@@ -39,8 +39,7 @@ export default function Topbar() {
           <span aria-hidden className="text-accent">
             ◆
           </span>
-          FuzzyMind
-          <span className="eyebrow ml-2 hidden sm:inline">Fuzzy Mamdani</span>
+          Tugas Besar Metode Numerik dan Aljabar Linier
         </a>
 
         <ul className="flex items-center">

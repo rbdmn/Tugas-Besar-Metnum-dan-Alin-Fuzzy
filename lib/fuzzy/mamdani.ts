@@ -13,13 +13,14 @@ import {
   risikoVariable,
   stresVariable,
   tidurVariable,
-  type FuzzyRule,
 } from "./rules";
 import type {
   FuzzyLabel,
+  FuzzyResult,
   FuzzyVariable,
   MembershipDegrees,
   RiskCategory,
+  RuleActivation,
 } from "./types";
 
 const LABELS: readonly FuzzyLabel[] = ["Rendah", "Sedang", "Tinggi"];
@@ -27,25 +28,10 @@ const LABELS: readonly FuzzyLabel[] = ["Rendah", "Sedang", "Tinggi"];
 /** Langkah resolusi sampling untuk integrasi numerik centroid. */
 const CENTROID_STEP = 0.1;
 
-/** Aktivasi satu rule beserta konteksnya (untuk trace/debug). */
-export interface RuleActivation {
-  rule: FuzzyRule;
-  stresDegree: number;
-  tidurDegree: number;
-  alpha: number;
-}
+/** Hasil lengkap pipeline Mamdani (skor & kategori akhir + jejak tiap tahap). */
+export type MamdaniResult = FuzzyResult;
 
-/** Hasil lengkap pipeline + trace tiap tahap untuk validasi/debug. */
-export interface MamdaniResult {
-  score: number;
-  category: RiskCategory;
-  trace: {
-    fuzzifyStres: MembershipDegrees;
-    fuzzifyTidur: MembershipDegrees;
-    activations: RuleActivation[];
-    aggregated: MembershipDegrees; // α maksimum per himpunan output
-  };
-}
+export type { RuleActivation };
 
 /** Tahap 1 — fuzzifikasi: derajat keanggotaan `x` ke tiap himpunan variabel. */
 export function fuzzify(variable: FuzzyVariable, x: number): MembershipDegrees {
@@ -61,11 +47,14 @@ export function inferActivations(
   stresDegrees: MembershipDegrees,
   tidurDegrees: MembershipDegrees,
 ): RuleActivation[] {
-  return ruleBase.map((rule) => {
+  return ruleBase.map((rule, i) => {
     const stresDegree = stresDegrees[rule.stres];
     const tidurDegree = tidurDegrees[rule.tidur];
     return {
-      rule,
+      id: i + 1,
+      stres: rule.stres,
+      tidur: rule.tidur,
+      output: rule.output,
       stresDegree,
       tidurDegree,
       alpha: Math.min(stresDegree, tidurDegree),
@@ -76,8 +65,8 @@ export function inferActivations(
 /** Tahap 3 — agregasi: α maksimum per himpunan output. */
 export function aggregate(activations: RuleActivation[]): MembershipDegrees {
   const agg: MembershipDegrees = { Rendah: 0, Sedang: 0, Tinggi: 0 };
-  for (const { rule, alpha } of activations) {
-    if (alpha > agg[rule.output]) agg[rule.output] = alpha;
+  for (const { output, alpha } of activations) {
+    if (alpha > agg[output]) agg[output] = alpha;
   }
   return agg;
 }
@@ -129,17 +118,29 @@ export function scoreToCategory(score: number): RiskCategory {
 
 /** Jalankan pipeline Mamdani penuh untuk sepasang input (stres 0–100, tidur 0–12). */
 export function runMamdani(stres: number, tidur: number): MamdaniResult {
-  const fuzzifyStres = fuzzify(stresVariable, stres);
-  const fuzzifyTidur = fuzzify(tidurVariable, tidur);
-  const activations = inferActivations(fuzzifyStres, fuzzifyTidur);
+  // Tahap 1 — Fuzzifikasi
+  const stresDegrees = fuzzify(stresVariable, stres);
+  const tidurDegrees = fuzzify(tidurVariable, tidur);
+  // Tahap 2 — Inferensi
+  const activations = inferActivations(stresDegrees, tidurDegrees);
+  // Tahap 3 — Agregasi
   const aggregated = aggregate(activations);
+  // Tahap 4 — Defuzzifikasi
   const score = defuzzifyCentroid(aggregated);
   const category = scoreToCategory(score);
 
   return {
     score,
     category,
-    trace: { fuzzifyStres, fuzzifyTidur, activations, aggregated },
+    trace: {
+      fuzzification: {
+        stres: { input: stres, degrees: stresDegrees },
+        tidur: { input: tidur, degrees: tidurDegrees },
+      },
+      activations,
+      aggregated,
+      defuzzification: { score, category },
+    },
   };
 }
 

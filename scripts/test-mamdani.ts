@@ -37,19 +37,20 @@ for (const tc of cases) {
 
   console.log(`\n=========== ${tc.name}  (stres=${tc.stres}, tidur=${tc.tidur}) ===========`);
 
+  const fz = trace.fuzzification;
   console.log("1) Fuzzifikasi:");
   console.log(
-    `   Stres → R=${f(trace.fuzzifyStres.Rendah)} S=${f(trace.fuzzifyStres.Sedang)} T=${f(trace.fuzzifyStres.Tinggi)}`,
+    `   Stres=${fz.stres.input} → R=${f(fz.stres.degrees.Rendah)} S=${f(fz.stres.degrees.Sedang)} T=${f(fz.stres.degrees.Tinggi)}`,
   );
   console.log(
-    `   Tidur → Kurang=${f(trace.fuzzifyTidur.Rendah)} Cukup=${f(trace.fuzzifyTidur.Sedang)} Banyak=${f(trace.fuzzifyTidur.Tinggi)}`,
+    `   Tidur=${fz.tidur.input} → Kurang=${f(fz.tidur.degrees.Rendah)} Cukup=${f(fz.tidur.degrees.Sedang)} Banyak=${f(fz.tidur.degrees.Tinggi)}`,
   );
 
   console.log("2) Inferensi (α = MIN), rule aktif (α>0):");
   for (const a of trace.activations) {
     if (a.alpha > 0) {
       console.log(
-        `   [Stres ${a.rule.stres} ∧ Tidur ${a.rule.tidur} → ${a.rule.output}]` +
+        `   R${a.id} [Stres ${a.stres} ∧ Tidur ${a.tidur} → ${a.output}]` +
           ` min(${f(a.stresDegree)}, ${f(a.tidurDegree)}) = ${f(a.alpha)}`,
       );
     }
