@@ -31,7 +31,7 @@ const categories = [
 export default function Landing() {
   return (
     <section id="pengantar" aria-labelledby="pengantar-heading">
-      <div className="mx-auto grid max-w-content grid-cols-1 gap-px border-x border-border-default lg:grid-cols-12">
+      <div className="panel-shadow mx-auto grid max-w-content grid-cols-1 gap-px border border-accent-3/60 lg:grid-cols-12">
         {/* Kolom kiri — judul & CTA */}
         <div className="lg:col-span-7 px-6 py-10 sm:px-8">
           <Eyebrow className="text-accent">
@@ -81,26 +81,14 @@ export default function Landing() {
                   </p>
                   <p className="font-mono text-xs text-text-muted">{m.nim}</p>
                 </div>
-                <span className="font-mono text-xs text-text-secondary">
-                  {m.role}
-                </span>
               </li>
             ))}
           </ul>
-          <div className="px-6 py-4">
-            <Eyebrow>Studi Kasus</Eyebrow>
-            <p className="mt-1 text-sm text-text-secondary">
-              Risiko kesehatan mental mahasiswa.
-            </p>
-            <p className="mt-3 text-xs text-text-muted">
-              Edukatif — bukan diagnosis medis.
-            </p>
-          </div>
         </aside>
       </div>
 
       {/* Legend kategori risiko — warna = makna (gaya legenda O/M/P) */}
-      <div className="mx-auto grid max-w-content grid-cols-1 border border-border-default sm:grid-cols-3">
+      <div className="panel-shadow mx-auto mt-4 grid max-w-content grid-cols-1 border border-accent-3/60 bg-surface sm:grid-cols-3">
         {categories.map((c, i) => (
           <div
             key={c.key}

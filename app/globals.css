@@ -24,7 +24,7 @@
   --text-muted: #74a0b8; /* teks redup / placeholder — dinaikkan agar lolos WCAG AA (≥4.5) di atas surface & base (AX-01) */
 
   /* Garis & state */
-  --border: #0a3247; /* border halus */
+  --border: #134761; /* border — dinaikkan agar tepi panel jelas terlihat di latar gelap */
   --border-active: #00a6fb; /* border aktif/fokus */
 
   /* Warna semantik hasil risiko (PRD 2.3) */
@@ -116,6 +116,11 @@ body {
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--text-muted);
+}
+
+/* Bayangan halus untuk memisahkan panel dari latar (bukan glow). */
+.panel-shadow {
+  box-shadow: 0 10px 30px -16px rgba(0, 0, 0, 0.8);
 }
 
 /* Angka data: monospace, rapat, tabular. */

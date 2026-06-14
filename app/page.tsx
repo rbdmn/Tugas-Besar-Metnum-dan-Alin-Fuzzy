@@ -13,8 +13,7 @@ export default function Home() {
       <footer className="border-t border-border-default">
         <div className="mx-auto max-w-content px-4 py-6 sm:px-6">
           <p className="font-mono text-[11px] text-text-muted">
-            FuzzyMind · Fuzzy Mamdani · Metode Numerik · alat edukatif, bukan
-            diagnosis medis.
+            Tugas Besar Metode Numerik dan Aljabar Linear dan Matriks
           </p>
         </div>
       </footer>

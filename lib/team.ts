@@ -6,14 +6,14 @@
 export interface TeamMember {
   name: string;
   nim: string;
-  role: string;
 }
 
 export const teamMembers: readonly TeamMember[] = [
-  { name: "Anggota Satu", nim: "0000000001", role: "Fuzzy Engine" },
-  { name: "Anggota Dua", nim: "0000000002", role: "Frontend / UI" },
-  { name: "Anggota Tiga", nim: "0000000003", role: "Visualisasi" },
-  { name: "Anggota Empat", nim: "0000000004", role: "Dokumentasi" },
+  { name: "Abdurrahman Rauf Budiman", nim: "2301102"},
+  { name: "Faiz Bayu Erlangga", nim: "2311231"},
+  { name: "Marco Henrik Abineno", nim: "2301093"},
+  { name: "Muhammad Alvinza", nim: "2304879"},
+  { name: "Naufal Fakhri Al-Najieb", nim: "2309648"},
 ];
 
 /** Ambil inisial dari nama untuk avatar (maks 2 huruf). */
