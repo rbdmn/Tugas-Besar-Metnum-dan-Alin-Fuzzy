@@ -5,36 +5,36 @@
 
 import type { FuzzyLabel, FuzzyVariable } from "./types";
 
-/** Variabel input: Tingkat Stres (0–100). PRD 4.1. */
+/** Variabel input: Tingkat Stres (0–100). Parameter PRD revisi. */
 export const stresVariable: FuzzyVariable = {
   name: "Stres",
   range: [0, 100],
   sets: [
-    { label: "Rendah", shape: "trapezoid", params: [0, 0, 20, 40] },
-    { label: "Sedang", shape: "triangle", params: [30, 50, 70] },
-    { label: "Tinggi", shape: "trapezoid", params: [60, 80, 100, 100] },
+    { label: "Rendah", shape: "trapezoid", params: [0, 0, 25, 50] },
+    { label: "Sedang", shape: "triangle", params: [25, 50, 75] },
+    { label: "Tinggi", shape: "trapezoid", params: [50, 75, 100, 100] },
   ],
 };
 
-/** Variabel input: Jam Tidur (0–12). PRD 4.1. */
+/** Variabel input: Jam Tidur (0–12). Parameter PRD revisi. */
 export const tidurVariable: FuzzyVariable = {
   name: "Jam Tidur",
   range: [0, 12],
   sets: [
-    { label: "Rendah", shape: "trapezoid", params: [0, 0, 4, 6] }, // "Kurang"
-    { label: "Sedang", shape: "triangle", params: [5, 7, 9] }, // "Cukup"
-    { label: "Tinggi", shape: "trapezoid", params: [8, 10, 12, 12] }, // "Banyak"
+    { label: "Rendah", shape: "trapezoid", params: [0, 0, 4, 7] }, // "Kurang"
+    { label: "Sedang", shape: "trapezoid", params: [4, 7, 9, 11] }, // "Cukup" — kini trapesium (plateau 7–9)
+    { label: "Tinggi", shape: "trapezoid", params: [9, 11, 12, 12] }, // "Banyak"
   ],
 };
 
-/** Variabel output: Risiko (0–100). PRD 4.2. */
+/** Variabel output: Risiko (0–100). Parameter PRD revisi. */
 export const risikoVariable: FuzzyVariable = {
   name: "Risiko",
   range: [0, 100],
   sets: [
-    { label: "Rendah", shape: "trapezoid", params: [0, 0, 25, 45] },
-    { label: "Sedang", shape: "triangle", params: [35, 55, 75] },
-    { label: "Tinggi", shape: "trapezoid", params: [65, 80, 100, 100] },
+    { label: "Rendah", shape: "trapezoid", params: [0, 0, 25, 50] },
+    { label: "Sedang", shape: "triangle", params: [25, 50, 75] },
+    { label: "Tinggi", shape: "trapezoid", params: [50, 75, 100, 100] },
   ],
 };
 
@@ -56,7 +56,10 @@ export interface FuzzyRule {
  * |---------------|--------|--------|--------|
  * | Rendah        | Sedang | Rendah | Rendah |
  * | Sedang        | Tinggi | Sedang | Sedang |
- * | Tinggi        | Tinggi | Tinggi | Sedang |
+ * | Tinggi        | Tinggi | Tinggi | Tinggi |
+ *
+ * Catatan: sel [Tinggi, Banyak] (R9) = Tinggi sesuai acuan validasi PRD revisi
+ * (stres tinggi tetap berisiko tinggi meski jam tidur banyak).
  */
 export const ruleBase: readonly FuzzyRule[] = [
   // Stres Rendah
@@ -70,5 +73,5 @@ export const ruleBase: readonly FuzzyRule[] = [
   // Stres Tinggi
   { stres: "Tinggi", tidur: "Rendah", output: "Tinggi" },
   { stres: "Tinggi", tidur: "Sedang", output: "Tinggi" },
-  { stres: "Tinggi", tidur: "Tinggi", output: "Sedang" },
+  { stres: "Tinggi", tidur: "Tinggi", output: "Tinggi" }, // R9
 ];
