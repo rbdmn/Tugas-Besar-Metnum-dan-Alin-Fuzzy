@@ -26,7 +26,7 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "FuzzyMind — Penilaian Risiko Kesehatan Mental",
+  title: "KELOMPOK 3 - TUBES ALIN METNUM",
   description:
     "Simulasi edukatif penilaian risiko kesehatan mental mahasiswa dengan logika fuzzy metode Mamdani. Bukan alat diagnosis medis.",
 };

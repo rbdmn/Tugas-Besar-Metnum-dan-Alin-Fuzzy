@@ -52,26 +52,27 @@ export interface FuzzyRule {
 /**
  * Rule base 9 rule (PRD 4.3).
  *
- * | Stres \ Tidur | Kurang | Cukup  | Banyak |
- * |---------------|--------|--------|--------|
- * | Rendah        | Sedang | Rendah | Rendah |
- * | Sedang        | Tinggi | Sedang | Sedang |
- * | Tinggi        | Tinggi | Tinggi | Tinggi |
+ * | Stres \ Tidur | Kurang | Cukup  | Berlebih |
+ * |---------------|--------|--------|----------|
+ * | Rendah        | Sedang | Rendah | Sedang   |
+ * | Sedang        | Tinggi | Sedang | Sedang   |
+ * | Tinggi        | Tinggi | Sedang | Tinggi   |
  *
- * Catatan: sel [Tinggi, Banyak] (R9) = Tinggi sesuai acuan validasi PRD revisi
- * (stres tinggi tetap berisiko tinggi meski jam tidur banyak).
+ * Mengikuti Tabel 3.3 (matriks basis aturan laporan). Catatan sel khusus:
+ * R3 [Rendah, Berlebih] = Sedang, R8 [Tinggi, Cukup] = Sedang,
+ * R9 [Tinggi, Berlebih] = Tinggi.
  */
 export const ruleBase: readonly FuzzyRule[] = [
   // Stres Rendah
-  { stres: "Rendah", tidur: "Rendah", output: "Sedang" },
-  { stres: "Rendah", tidur: "Sedang", output: "Rendah" },
-  { stres: "Rendah", tidur: "Tinggi", output: "Rendah" },
+  { stres: "Rendah", tidur: "Rendah", output: "Sedang" }, // R1
+  { stres: "Rendah", tidur: "Sedang", output: "Rendah" }, // R2
+  { stres: "Rendah", tidur: "Tinggi", output: "Sedang" }, // R3  (Berlebih → Sedang)
   // Stres Sedang
-  { stres: "Sedang", tidur: "Rendah", output: "Tinggi" },
-  { stres: "Sedang", tidur: "Sedang", output: "Sedang" },
-  { stres: "Sedang", tidur: "Tinggi", output: "Sedang" },
+  { stres: "Sedang", tidur: "Rendah", output: "Tinggi" }, // R4
+  { stres: "Sedang", tidur: "Sedang", output: "Sedang" }, // R5
+  { stres: "Sedang", tidur: "Tinggi", output: "Sedang" }, // R6
   // Stres Tinggi
-  { stres: "Tinggi", tidur: "Rendah", output: "Tinggi" },
-  { stres: "Tinggi", tidur: "Sedang", output: "Tinggi" },
+  { stres: "Tinggi", tidur: "Rendah", output: "Tinggi" }, // R7
+  { stres: "Tinggi", tidur: "Sedang", output: "Sedang" }, // R8  (Cukup → Sedang)
   { stres: "Tinggi", tidur: "Tinggi", output: "Tinggi" }, // R9
 ];

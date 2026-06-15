@@ -86,11 +86,30 @@ export interface MamdaniTrace {
   aggregated: MembershipDegrees;
   /** Tahap 4 — Defuzzifikasi (centroid). */
   defuzzification: {
-    /** Skor risiko hasil centroid (z*), 0–100. */
+    /** Skor risiko hasil centroid presisi (integrasi halus), 0–100 — sumber kartu/gauge. */
     score: number;
     /** Kategori risiko terpetakan dari skor. */
     category: RiskCategory;
+    /** Tabel sampling Δz=5 (ilustrasi proses centroid). */
+    sampling: CentroidSampling;
   };
+}
+
+/** Satu titik sampling pada tabel centroid. */
+export interface CentroidSamplePoint {
+  z: number;
+  muAgg: number;
+  muAggZ: number; // μ_agg(z) · z
+}
+
+/** Tabel sampling centroid (Δz) + totalnya. */
+export interface CentroidSampling {
+  step: number;
+  points: CentroidSamplePoint[];
+  sumMu: number; // Σ μ_agg(z)
+  sumMuZ: number; // Σ μ_agg(z)·z
+  /** z* pendekatan dari sampling = sumMuZ / sumMu. */
+  sampledScore: number;
 }
 
 /** Hasil akhir pipeline Mamdani: skor & kategori + jejak tiap tahap. */

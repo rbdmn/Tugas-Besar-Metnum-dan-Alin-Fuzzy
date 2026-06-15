@@ -15,6 +15,8 @@ import {
   tidurVariable,
 } from "./rules";
 import type {
+  CentroidSamplePoint,
+  CentroidSampling,
   FuzzyLabel,
   FuzzyResult,
   FuzzyVariable,
@@ -72,11 +74,23 @@ export function aggregate(activations: RuleActivation[]): MembershipDegrees {
 }
 
 /**
- * Tahap 4 — defuzzifikasi Centroid.
- *
- * Untuk tiap titik z pada domain output, derajat keanggotaan teragregasi adalah
+ * Derajat keanggotaan teragregasi di titik z:
  *   μ(z) = MAX_label( MIN(α_label, μ_label(z)) )   // clipping (alpha-cut) + MAX
- * Centroid: z* = Σ z·μ(z) / Σ μ(z).
+ */
+function aggregatedMu(z: number, aggregated: MembershipDegrees): number {
+  let mu = 0;
+  for (const set of risikoVariable.sets) {
+    const alpha = aggregated[set.label];
+    if (alpha <= 0) continue;
+    const clipped = Math.min(alpha, membershipOf(z, set));
+    if (clipped > mu) mu = clipped;
+  }
+  return mu;
+}
+
+/**
+ * Tahap 4 — defuzzifikasi Centroid (integrasi halus, presisi penuh).
+ * z* = Σ z·μ(z) / Σ μ(z).
  */
 export function defuzzifyCentroid(aggregated: MembershipDegrees): number {
   const [lo, hi] = risikoVariable.range;
@@ -84,13 +98,7 @@ export function defuzzifyCentroid(aggregated: MembershipDegrees): number {
   let denominator = 0;
 
   for (let z = lo; z <= hi + 1e-9; z += CENTROID_STEP) {
-    let mu = 0;
-    for (const set of risikoVariable.sets) {
-      const alpha = aggregated[set.label];
-      if (alpha <= 0) continue;
-      const clipped = Math.min(alpha, membershipOf(z, set));
-      if (clipped > mu) mu = clipped; // agregasi MAX antar himpunan output
-    }
+    const mu = aggregatedMu(z, aggregated);
     numerator += z * mu;
     denominator += mu;
   }
@@ -98,6 +106,34 @@ export function defuzzifyCentroid(aggregated: MembershipDegrees): number {
   // Jika tidak ada rule yang aktif sama sekali, kembalikan titik tengah domain.
   if (denominator === 0) return (lo + hi) / 2;
   return numerator / denominator;
+}
+
+/** Langkah sampling (Δz) untuk tabel ilustrasi centroid. */
+const SAMPLE_STEP = 5;
+
+/**
+ * Tabel sampling centroid (Δz=5) dari kurva agregasi aktual — untuk ditampilkan
+ * ke pengguna sebagai ilustrasi proses. Bukan sumber skor final (lihat
+ * defuzzifyCentroid yang presisi penuh).
+ */
+export function sampleCentroid(
+  aggregated: MembershipDegrees,
+): CentroidSampling {
+  const [lo, hi] = risikoVariable.range;
+  const points: CentroidSamplePoint[] = [];
+  let sumMu = 0;
+  let sumMuZ = 0;
+
+  for (let z = lo; z <= hi + 1e-9; z += SAMPLE_STEP) {
+    const muAgg = aggregatedMu(z, aggregated);
+    const muAggZ = muAgg * z;
+    points.push({ z, muAgg, muAggZ });
+    sumMu += muAgg;
+    sumMuZ += muAggZ;
+  }
+
+  const sampledScore = sumMu > 0 ? sumMuZ / sumMu : (lo + hi) / 2;
+  return { step: SAMPLE_STEP, points, sumMu, sumMuZ, sampledScore };
 }
 
 /**
@@ -125,9 +161,10 @@ export function runMamdani(stres: number, tidur: number): MamdaniResult {
   const activations = inferActivations(stresDegrees, tidurDegrees);
   // Tahap 3 — Agregasi
   const aggregated = aggregate(activations);
-  // Tahap 4 — Defuzzifikasi
+  // Tahap 4 — Defuzzifikasi (presisi penuh) + tabel sampling (ilustrasi)
   const score = defuzzifyCentroid(aggregated);
   const category = scoreToCategory(score);
+  const sampling = sampleCentroid(aggregated);
 
   return {
     score,
@@ -139,7 +176,7 @@ export function runMamdani(stres: number, tidur: number): MamdaniResult {
       },
       activations,
       aggregated,
-      defuzzification: { score, category },
+      defuzzification: { score, category, sampling },
     },
   };
 }

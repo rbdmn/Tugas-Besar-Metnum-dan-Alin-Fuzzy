@@ -67,7 +67,7 @@ export default function Landing() {
         {/* Kolom kanan — panel info & tim */}
         <aside className="lg:col-span-5 border-t border-border-default bg-surface lg:border-l lg:border-t-0">
           <div className="border-b border-border-default px-6 py-4">
-            <Eyebrow>Anggota Kelompok</Eyebrow>
+            <Eyebrow>Anggota Kelompok 3</Eyebrow>
           </div>
           <ul>
             {teamMembers.map((m) => (

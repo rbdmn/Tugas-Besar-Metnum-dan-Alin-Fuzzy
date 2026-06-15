@@ -1,12 +1,21 @@
 "use client";
 
+import { useState } from "react";
 import { membershipOf } from "@/lib/fuzzy/membership";
 import { stresVariable, tidurVariable } from "@/lib/fuzzy/rules";
-import type { FuzzyLabel, FuzzySet, FuzzyVariable } from "@/lib/fuzzy/types";
+import type {
+  CentroidSampling,
+  FuzzyLabel,
+  FuzzySet,
+  FuzzyVariable,
+} from "@/lib/fuzzy/types";
 import type { MamdaniResult } from "@/lib/fuzzy/mamdani";
 import { Eyebrow, Formula, PanelHeader } from "@/components/ui/primitives";
 import FuzzySetChart from "@/components/charts/FuzzySetChart";
 import DefuzzChart from "@/components/charts/DefuzzChart";
+
+/** Format angka gaya Indonesia (koma desimal). */
+const idNum = (n: number, d: number) => n.toFixed(d).replace(".", ",");
 
 /**
  * Visualisasi proses fuzzy Mamdani (4 tahap) di section Hasil.
@@ -88,6 +97,91 @@ function WorkedDegrees({
         })}
       </tbody>
     </table>
+  );
+}
+
+/** Formula numerik z* (selalu tampil) + tabel sampling Δz=5 (collapsible). */
+function SamplingTable({ sampling }: { sampling: CentroidSampling }) {
+  const [open, setOpen] = useState(false);
+  const { points, sumMu, sumMuZ, sampledScore, step } = sampling;
+
+  return (
+    <div className="space-y-3">
+      {/* Formula numerik — selalu terlihat tanpa expand */}
+      <Formula caption={`substitusi total dari tabel sampling (Δz=${step})`}>
+        z* = Σ[μ(z)·z] / Σμ(z) = {idNum(sumMuZ, 2)} / {idNum(sumMu, 3)} ≈{" "}
+        {idNum(sampledScore, 1)}
+      </Formula>
+
+      {/* Toggle detail tabel */}
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        aria-expanded={open}
+        className="flex w-full items-center justify-between border border-border-default bg-surface/40 px-3 py-2 text-left font-mono text-xs text-text-secondary transition-colors hover:bg-surface"
+      >
+        <span>
+          Lihat detail tabel sampling · {points.length} titik (Δz={step})
+        </span>
+        <span
+          aria-hidden
+          className="text-accent transition-transform duration-300"
+          style={{ transform: open ? "rotate(180deg)" : "rotate(0deg)" }}
+        >
+          ▾
+        </span>
+      </button>
+
+      <div
+        className={`grid transition-all duration-300 ease-out ${
+          open ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
+        }`}
+      >
+        <div className="overflow-hidden">
+          <div className="border border-border-default">
+            <table className="w-full border-collapse font-mono text-xs">
+              <thead>
+                <tr className="border-b border-border-default bg-surface/40">
+                  <th className="eyebrow px-3 py-2 text-left">z</th>
+                  <th className="eyebrow px-3 py-2 text-right">μ_agg(z)</th>
+                  <th className="eyebrow px-3 py-2 text-right">μ_agg(z)·z</th>
+                </tr>
+              </thead>
+              <tbody>
+                {points.map((p) => (
+                  <tr
+                    key={p.z}
+                    className={`border-b border-border-default ${p.muAgg > 0 ? "" : "opacity-45"}`}
+                  >
+                    <td className="px-3 py-1 text-text-secondary">{p.z}</td>
+                    <td className="px-3 py-1 text-right text-text-primary">
+                      {idNum(p.muAgg, 3)}
+                    </td>
+                    <td className="px-3 py-1 text-right text-text-primary">
+                      {idNum(p.muAggZ, 2)}
+                    </td>
+                  </tr>
+                ))}
+                <tr className="bg-surface/40 font-bold">
+                  <td className="px-3 py-2 text-text-primary">Σ</td>
+                  <td className="px-3 py-2 text-right text-text-primary">
+                    {idNum(sumMu, 3)}
+                  </td>
+                  <td className="px-3 py-2 text-right text-text-primary">
+                    {idNum(sumMuZ, 2)}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <p className="text-[11px] text-text-muted">
+        Nilai pada tabel adalah pendekatan sampling untuk ilustrasi; skor risiko
+        final menggunakan perhitungan presisi penuh.
+      </p>
+    </div>
   );
 }
 
@@ -316,8 +410,11 @@ export default function FuzzyProcess({ result }: { result: MamdaniResult }) {
             />
           </div>
 
+          {/* Tabel sampling centroid (formula numerik + detail collapsible) */}
+          <SamplingTable sampling={trace.defuzzification.sampling} />
+
           <p className="text-center font-mono text-sm text-text-secondary">
-            z* ={" "}
+            Skor risiko final (presisi penuh): z* ={" "}
             <span className="stat-num text-text-primary">
               {result.score.toFixed(2)}
             </span>{" "}

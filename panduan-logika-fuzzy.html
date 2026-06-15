@@ -214,9 +214,9 @@
 <p><b>Basis aturan</b> (Stres × Tidur → Risiko):</p>
 <table>
   <tr><th>Stres \ Tidur</th><th class="n">Kurang</th><th class="n">Cukup</th><th class="n">Banyak</th></tr>
-  <tr><td><b>Rendah</b></td><td class="n">Sedang</td><td class="n">Rendah</td><td class="n">Rendah</td></tr>
+  <tr><td><b>Rendah</b></td><td class="n">Sedang</td><td class="n">Rendah</td><td class="n">Sedang</td></tr>
   <tr><td><b>Sedang</b></td><td class="n">Tinggi</td><td class="n">Sedang</td><td class="n">Sedang</td></tr>
-  <tr><td><b>Tinggi</b></td><td class="n">Tinggi</td><td class="n">Tinggi</td><td class="n">Tinggi</td></tr>
+  <tr><td><b>Tinggi</b></td><td class="n">Tinggi</td><td class="n">Sedang</td><td class="n">Tinggi</td></tr>
 </table>
 
 <h3>Profil yang dinilai</h3>
@@ -243,26 +243,26 @@
   <tr><td>R1</td><td>Sedang ∧ Kurang</td><td class="n">min(0,28 ; 0,5) = 0,28</td><td>Tinggi</td></tr>
   <tr><td>R2</td><td>Sedang ∧ Cukup</td><td class="n">min(0,28 ; 0,5) = 0,28</td><td>Sedang</td></tr>
   <tr><td>R3</td><td>Tinggi ∧ Kurang</td><td class="n">min(0,72 ; 0,5) = 0,5</td><td>Tinggi</td></tr>
-  <tr><td>R4</td><td>Tinggi ∧ Cukup</td><td class="n">min(0,72 ; 0,5) = 0,5</td><td>Tinggi</td></tr>
+  <tr><td>R4</td><td>Tinggi ∧ Cukup</td><td class="n">min(0,72 ; 0,5) = 0,5</td><td>Sedang</td></tr>
 </table>
 
 <h3>Langkah 3 &amp; 4 — Implikasi &amp; agregasi (OR = max)</h3>
 <ul>
-  <li>Risiko <b>Sedang</b>: dari R2 → 0,28</li>
-  <li>Risiko <b>Tinggi</b>: dari R1, R3, R4 → max(0,28 ; 0,5 ; 0,5) = 0,5</li>
+  <li>Risiko <b>Sedang</b>: dari R2 (0,28) &amp; R4 (0,5) → max = 0,5</li>
+  <li>Risiko <b>Tinggi</b>: dari R1 (0,28) &amp; R3 (0,5) → max = 0,5</li>
 </ul>
-<p>Jadi himpunan Sedang dipotong di 0,28 dan Tinggi dipotong di 0,5, lalu ditumpuk jadi satu arsiran.</p>
+<p>Jadi himpunan Sedang dipotong di 0,5 dan Tinggi dipotong di 0,5, lalu ditumpuk jadi satu arsiran.</p>
 
 <h3>Langkah 5 — Defuzzifikasi (centroid, sampling tiap 5)</h3>
 <table>
   <tr><th class="n">z</th><th class="n">μ(z)</th><th class="n">μ(z)·z</th></tr>
   <tr><td class="n">30</td><td class="n">0,2</td><td class="n">6,0</td></tr>
-  <tr><td class="n">35</td><td class="n">0,28</td><td class="n">9,8</td></tr>
-  <tr><td class="n">40</td><td class="n">0,28</td><td class="n">11,2</td></tr>
-  <tr><td class="n">45</td><td class="n">0,28</td><td class="n">12,6</td></tr>
-  <tr><td class="n">50</td><td class="n">0,28</td><td class="n">14,0</td></tr>
-  <tr><td class="n">55</td><td class="n">0,28</td><td class="n">15,4</td></tr>
-  <tr><td class="n">60</td><td class="n">0,4</td><td class="n">24,0</td></tr>
+  <tr><td class="n">35</td><td class="n">0,4</td><td class="n">14,0</td></tr>
+  <tr><td class="n">40</td><td class="n">0,5</td><td class="n">20,0</td></tr>
+  <tr><td class="n">45</td><td class="n">0,5</td><td class="n">22,5</td></tr>
+  <tr><td class="n">50</td><td class="n">0,5</td><td class="n">25,0</td></tr>
+  <tr><td class="n">55</td><td class="n">0,5</td><td class="n">27,5</td></tr>
+  <tr><td class="n">60</td><td class="n">0,5</td><td class="n">30,0</td></tr>
   <tr><td class="n">65</td><td class="n">0,5</td><td class="n">32,5</td></tr>
   <tr><td class="n">70</td><td class="n">0,5</td><td class="n">35,0</td></tr>
   <tr><td class="n">75</td><td class="n">0,5</td><td class="n">37,5</td></tr>
@@ -271,19 +271,19 @@
   <tr><td class="n">90</td><td class="n">0,5</td><td class="n">45,0</td></tr>
   <tr><td class="n">95</td><td class="n">0,5</td><td class="n">47,5</td></tr>
   <tr><td class="n">100</td><td class="n">0,5</td><td class="n">50,0</td></tr>
-  <tr class="tot"><td class="n">Σ</td><td class="n">6,0</td><td class="n">423,0</td></tr>
+  <tr class="tot"><td class="n">Σ</td><td class="n">7,1</td><td class="n">475,0</td></tr>
 </table>
-<div class="formula">z* = 423,0 / 6,0 ≈ 70,5</div>
+<div class="formula">z* = 475,0 / 7,1 ≈ 66,9</div>
 
 <figure>
-  <svg viewBox="0 0 640 250" role="img" aria-label="Area output gabungan dengan titik centroid sekitar 76,7">
+  <svg viewBox="0 0 640 250" role="img" aria-label="Area output gabungan dengan titik centroid sekitar 66,9">
     <line x1="60" y1="210" x2="615" y2="210" stroke="#B4B2A9" stroke-width="1"/>
     <line x1="60" y1="210" x2="60" y2="34" stroke="#B4B2A9" stroke-width="1"/>
     <polyline points="195,210 330,40 465,210" fill="none" stroke="#BA7517" stroke-width="1.3" stroke-dasharray="6 4"/>
     <polyline points="330,210 465,40 600,40" fill="none" stroke="#D85A30" stroke-width="1.3" stroke-dasharray="2 3"/>
-    <polygon points="195,210 232.8,162.4 367.8,162.4 397.5,125 600,125 600,210" fill="rgba(83,74,183,0.16)" stroke="#534AB7" stroke-width="2"/>
-    <line x1="440.7" y1="210" x2="440.7" y2="118" stroke="#534AB7" stroke-width="1.4" stroke-dasharray="3 3"/>
-    <text x="440.7" y="112" font-size="13" font-weight="600" fill="#3C3489" text-anchor="middle">z* ≈ 70,5</text>
+    <polygon points="195,210 262.5,125 600,125 600,210" fill="rgba(83,74,183,0.16)" stroke="#534AB7" stroke-width="2"/>
+    <line x1="421.3" y1="210" x2="421.3" y2="118" stroke="#534AB7" stroke-width="1.4" stroke-dasharray="3 3"/>
+    <text x="421.3" y="112" font-size="13" font-weight="600" fill="#3C3489" text-anchor="middle">z* ≈ 66,9</text>
     <text x="50" y="45" font-size="12" fill="#6B6A64" text-anchor="end">1</text>
     <text x="50" y="214" font-size="12" fill="#6B6A64" text-anchor="end">0</text>
     <text x="60" y="228" font-size="12" fill="#6B6A64" text-anchor="middle">0</text>
@@ -291,15 +291,15 @@
     <text x="330" y="228" font-size="12" fill="#6B6A64" text-anchor="middle">skor risiko</text>
   </svg>
   <div class="legend">
-    <span><span class="swatch" style="border-color:#BA7517;border-style:dashed"></span>Sedang (potong 0,28)</span>
+    <span><span class="swatch" style="border-color:#BA7517;border-style:dashed"></span>Sedang (potong 0,5)</span>
     <span><span class="swatch" style="border-color:#D85A30;border-style:dotted"></span>Tinggi (potong 0,5)</span>
     <span><span class="swatch" style="border-color:#534AB7"></span>area gabungan + centroid</span>
   </div>
-  <figcaption>Blok Tinggi (0,5) lebih berat daripada Sedang (0,28), sehingga titik seimbang tertarik ke kanan, ke ≈ 70,5.</figcaption>
+  <figcaption>Sedang &amp; Tinggi sama-sama dipotong 0,5; karena himpunan Tinggi menjangkau skor lebih tinggi (sampai 100), titik seimbang condong ke kanan, ke ≈ 66,9.</figcaption>
 </figure>
 
 <h3>Hasil &amp; interpretasi</h3>
-<p class="lead"><b>Skor risiko ≈ 70,5 → kategori <span class="chip c-coral">Risiko Tinggi</span>.</b> Masuk akal: stres tinggi dan tidur kurang menghasilkan risiko tinggi. Karena aturan-aturan yang mendukung "Tinggi" menyala lebih kuat, titik seimbang condong ke wilayah skor tinggi.</p>
+<p class="lead"><b>Skor risiko ≈ 66,9 → kategori <span class="chip c-coral">Risiko Tinggi</span>.</b> Masuk akal: stres tinggi dengan tidur kurang menghasilkan risiko tinggi. Dukungan untuk "Tinggi" menjangkau wilayah skor tinggi sehingga titik seimbang condong ke kanan.</p>
 
 <div class="divider"></div>
 
