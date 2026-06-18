@@ -38,22 +38,32 @@ const LABELS: FuzzyLabel[] = ["Rendah", "Sedang", "Tinggi"];
 const STEPS = ["Fuzzifikasi", "Inferensi", "Agregasi", "Defuzzifikasi"];
 
 /** Bangun string perhitungan lereng untuk satu himpunan pada nilai x. */
-function explainMembership(set: FuzzySet, x: number): { mu: number; expr: string } {
+function explainMembership(
+  set: FuzzySet,
+  x: number,
+): { mu: number; expr: string } {
   const mu = membershipOf(x, set);
   if (mu <= 0) return { mu, expr: "0 · di luar selang" };
   if (mu >= 1)
-    return { mu, expr: set.shape === "trapezoid" ? "1 · dataran" : "1 · puncak" };
+    return {
+      mu,
+      expr: set.shape === "trapezoid" ? "1 · dataran" : "1 · puncak",
+    };
   if (set.shape === "triangle") {
     const [a, b, c] = set.params;
     return {
       mu,
-      expr: x < b ? `(${x} − ${a}) / (${b} − ${a})` : `(${c} − ${x}) / (${c} − ${b})`,
+      expr:
+        x < b
+          ? `(${x} − ${a}) / (${b} − ${a})`
+          : `(${c} − ${x}) / (${c} − ${b})`,
     };
   }
   const [a, b, c, d] = set.params;
   return {
     mu,
-    expr: x < b ? `(${x} − ${a}) / (${b} − ${a})` : `(${d} − ${x}) / (${d} − ${c})`,
+    expr:
+      x < b ? `(${x} − ${a}) / (${b} − ${a})` : `(${d} − ${x}) / (${d} − ${c})`,
   };
 }
 
@@ -85,7 +95,9 @@ function WorkedDegrees({
                     className="inline-block h-2 w-2 rounded-full"
                     style={{ backgroundColor: SET_COLOR[set.label] }}
                   />
-                  <span className="text-text-secondary">{displayLabels[i]}</span>
+                  <span className="text-text-secondary">
+                    {displayLabels[i]}
+                  </span>
                 </span>
               </td>
               <td className="py-1.5 text-right text-text-muted">{expr}</td>
@@ -178,8 +190,8 @@ function SamplingTable({ sampling }: { sampling: CentroidSampling }) {
       </div>
 
       <p className="text-[11px] text-text-muted">
-        Nilai pada tabel adalah pendekatan sampling untuk ilustrasi; skor risiko
-        final menggunakan perhitungan presisi penuh.
+        Skor risiko final dihitung menggunakan metode centroid dengan titik
+        sampling (Δz=5).
       </p>
     </div>
   );
@@ -201,9 +213,7 @@ export default function FuzzyProcess({ result }: { result: MamdaniResult }) {
             <span className="border border-border-default px-2 py-1 font-mono text-[11px] text-text-secondary">
               {i + 1}. {s}
             </span>
-            {i < STEPS.length - 1 && (
-              <span className="text-text-muted">→</span>
-            )}
+            {i < STEPS.length - 1 && <span className="text-text-muted">→</span>}
           </span>
         ))}
       </div>
@@ -247,7 +257,9 @@ export default function FuzzyProcess({ result }: { result: MamdaniResult }) {
                 </p>
                 <p className="font-mono text-xs text-text-secondary">
                   nilai ={" "}
-                  <span className="stat-num text-text-primary">{stresInput}</span>
+                  <span className="stat-num text-text-primary">
+                    {stresInput}
+                  </span>
                 </p>
               </div>
               <FuzzySetChart
@@ -274,7 +286,9 @@ export default function FuzzyProcess({ result }: { result: MamdaniResult }) {
                 </p>
                 <p className="font-mono text-xs text-text-secondary">
                   nilai ={" "}
-                  <span className="stat-num text-text-primary">{tidurInput}</span>
+                  <span className="stat-num text-text-primary">
+                    {tidurInput}
+                  </span>
                 </p>
               </div>
               <FuzzySetChart
@@ -299,7 +313,10 @@ export default function FuzzyProcess({ result }: { result: MamdaniResult }) {
       <div className="grid grid-cols-1 border-t border-border-default lg:grid-cols-2">
         {/* TAHAP 2 — INFERENSI */}
         <div className="lg:border-r lg:border-border-default">
-          <PanelHeader label={<>Tahap 2 · Inferensi</>} meta="AND=min · OR=max" />
+          <PanelHeader
+            label={<>Tahap 2 · Inferensi</>}
+            meta="AND=min · OR=max"
+          />
           <div className="space-y-4 px-5 py-5">
             <div className="grid grid-cols-2 gap-3">
               <Formula size="sm" caption="gabungan AND">
@@ -324,7 +341,9 @@ export default function FuzzyProcess({ result }: { result: MamdaniResult }) {
                     key={a.id}
                     className="border-b border-border-default last:border-0"
                   >
-                    <td className="py-1.5 font-mono text-text-muted">R{a.id}</td>
+                    <td className="py-1.5 font-mono text-text-muted">
+                      R{a.id}
+                    </td>
                     <td className="py-1.5 text-text-secondary">
                       {a.stres} ∧ {TIDUR_DISPLAY[a.tidur]}
                     </td>
@@ -346,7 +365,10 @@ export default function FuzzyProcess({ result }: { result: MamdaniResult }) {
 
         {/* TAHAP 3 — AGREGASI */}
         <div className="border-t border-border-default lg:border-t-0">
-          <PanelHeader label={<>Tahap 3 · Agregasi</>} meta="α maks per output" />
+          <PanelHeader
+            label={<>Tahap 3 · Agregasi</>}
+            meta="α maks per output"
+          />
           <div className="space-y-3 px-5 py-5">
             {LABELS.map((label) => {
               const a = trace.aggregated[label];
@@ -414,7 +436,7 @@ export default function FuzzyProcess({ result }: { result: MamdaniResult }) {
           <SamplingTable sampling={trace.defuzzification.sampling} />
 
           <p className="text-center font-mono text-sm text-text-secondary">
-            Skor risiko final (presisi penuh): z* ={" "}
+            Skor risiko final: z* ={" "}
             <span className="stat-num text-text-primary">
               {result.score.toFixed(2)}
             </span>{" "}

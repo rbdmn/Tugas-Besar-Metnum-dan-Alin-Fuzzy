@@ -161,10 +161,10 @@ export function runMamdani(stres: number, tidur: number): MamdaniResult {
   const activations = inferActivations(stresDegrees, tidurDegrees);
   // Tahap 3 — Agregasi
   const aggregated = aggregate(activations);
-  // Tahap 4 — Defuzzifikasi (presisi penuh) + tabel sampling (ilustrasi)
-  const score = defuzzifyCentroid(aggregated);
-  const category = scoreToCategory(score);
-  const sampling = sampleCentroid(aggregated);
+  // Tahap 4 — Defuzzifikasi: centroid via tabel sampling (Δz=5)
+    const sampling = sampleCentroid(aggregated);
+    const score = sampling.sampledScore;
+    const category = scoreToCategory(score);
 
   return {
     score,
